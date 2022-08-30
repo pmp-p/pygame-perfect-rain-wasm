@@ -211,7 +211,12 @@ def slider(coords, background, handle, frame, mouse_pos, clicked, sound):
     if type(sound) == list:
         position = sound[0] * 0.01
     else:
-        position = sound.get_volume()
+        try:
+            position = sound.get_volume()
+        except:
+            position = 0
+            sound.set_volume(0)
+
     if clicked and rect.collidepoint(
         mouse_pos[0], mouse_pos[1] - handle.get_size()[1] / 2
     ):
