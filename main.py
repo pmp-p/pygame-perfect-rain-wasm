@@ -2,6 +2,12 @@ import asyncio
 import pygame
 import random
 
+if sys.platform == "emscripten":
+    try:
+        pygame.mixer.SoundPatch()
+    except:
+        pass
+
 pygame.init()
 
 pygame.mixer.init()
