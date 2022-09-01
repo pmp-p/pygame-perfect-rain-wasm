@@ -2,12 +2,6 @@ import asyncio
 import pygame
 import random
 
-if sys.platform == "emscripten":
-    try:
-        pygame.mixer.SoundPatch()
-    except:
-        pass
-
 pygame.init()
 
 pygame.mixer.init()
@@ -192,7 +186,7 @@ async def main():
 
             screen.blit(frame, (0, 0))
 
-        pygame.display.update()
+        pygame.display.flip()
         await asyncio.sleep(0)  # very important, and keep it 0
 
         if not running:
