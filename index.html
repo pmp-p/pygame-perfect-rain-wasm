@@ -1,4 +1,18 @@
-<html lang="en-us"><script src="https://pmp-p.github.io/pygbag-wip/pythons.js?cpython3.11#" type=module id="main" data-src="vtx,fs,gui" async defer>#<!--
+<html lang="en-us"><script src="https://pygame-web.github.io/archives/0.4/pythons.js" type=module id="site" data-src="vtx,fs,snd,gui" async defer>#<!--
+
+print("""
+Loading pygame-perfect-rain-wasm from pygame-perfect-rain-wasm.apk
+    Pygbag Version : 0.4.0
+    Template Version : 0.3.0
+    Python  : 3.11
+    CDN URL : https://pygame-web.github.io/archives/0.4/
+    Screen  : {{cookiecutter.width}}x{{cookiecutter.height}}
+    Title   : pygame-perfect-rain-wasm
+    Folder  : pygame-perfect-rain-wasm
+    Authors : pgw
+    SPDX-License-Identifier: cookiecutter.spdx
+
+""")
 
 import sys
 import asyncio
@@ -36,20 +50,10 @@ def uy(*argv):
         acc += u(HEIGHT, REFY, v)
     return acc
 
-print("""
-Loading pygame-perfect-rain-wasm from pygame-perfect-rain-wasm.apk
-    Pygbag Version : 0.2.0
-    Template Version : 0.2.0
-    CDN URL : https://pmp-p.github.io/pygbag-wip/
-    Screen  : {{cookiecutter.width}}x{{cookiecutter.height}}
-    Title   : pygame-perfect-rain-wasm
-    Folder  : pygame-perfect-rain-wasm
-    Authors : pgw
-    SPDX-License-Identifier: cookiecutter.spdx
 
-""")
 
-# don't rename
+
+# do not rename
 async def sitecustomize():
     import embed
 
@@ -74,7 +78,6 @@ async def sitecustomize():
     platform.window.canvas.style.visibility = "visible"
 
 
-    #print(json.dumps(PyConfig, sort_keys=True, indent=4))
 
     apk = "pygame-perfect-rain-wasm.apk"
 
@@ -134,6 +137,25 @@ async def sitecustomize():
 
     main = appdir / "assets" / "main.py"
 
+
+    if window.python.config.debug:
+
+        from aio.toplevel import AsyncInteractiveConsole
+
+        def importer(want, ex=None, resume=None):
+            print(f"{want=}, {resume=}, {ex=}")
+            return asyncio.sleep(0)
+
+
+
+        aio.create_task( AsyncInteractiveConsole(
+                globals(),
+                shell=shell,
+                importer=importer,
+            ).interact()
+        )
+
+
     # test/wait user media interaction
     if not platform.window.MM.UME:
 
@@ -153,9 +175,14 @@ async def sitecustomize():
         while not platform.window.MM.UME:
             await asyncio.sleep(.1)
 
+        screen.fill( (0,0,0,0) )
+        pygame.display.flip()
+
+
+
 
     print("145: running main and resuming EventTarget in a few seconds")
-    execfile(main)
+    aio.defer(execfile, (main,), {} )
 
     # if you don't reach that step
     # your main.py has an infinite sync loop somewhere !
@@ -163,10 +190,15 @@ async def sitecustomize():
 
 
     # makes all queued events arrive after program has looped a few cycles
+    # note that you need a call to asyncio.run in your main to continue past
+    # that check
     while not aio.run_called:
         await asyncio.sleep(.1)
 
     aio.create_task(platform.EventTarget.process())
+
+    print("platform event loop started")
+
 
 
 
@@ -174,21 +206,54 @@ asyncio.run( sitecustomize() )
 
 
 
+
+
+
+
+
+
+
+
+
+# BEGIN BLOCK
+#
+# now this is the html part you can (and should) customize
+# It is not mandatory : pygame-script when it reads the first line (also called
+# shebang ) of above code create absolute minimal widget set
+# required for running with default rules
+#
+# do not alter that comment block it is separating python code from html code
+# =============================================================================
 # --></script><head><!--
+//=============================================================================
+//
+//
+//
+//
+//
+//
+//
 
     {%- if cookiecutter.comment != "" -%}
 {{cookiecutter.comment}}
     {% endif %}
 
 --><script type="application/javascript">
+// END BLOCK
+
+
+
+// this dict is available under PyConfig.config from __main__
 
 config = {
     xtermjs : "1" ,
     _sdl2 : "canvas",
     user_canvas : 1,
+    ume_block : 1,
+    can_close : 0,
     archive : "pygame-perfect-rain-wasm",
     gui_debug : 3,
-    cdn : "https://pmp-p.github.io/pygbag-wip/",
+    cdn : "https://pygame-web.github.io/archives/0.4/",
     autorun : 0,
     PYBUILD : "3.11"
 }
@@ -201,8 +266,8 @@ config = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
 
+
     <link rel="icon" type="image/png" href="favicon.png" sizes="16x16">
-    <link rel="stylesheet" href="https://pmp-p.github.io/pygbag-wip//styles.css"/>
 
     <style>
         #status {
@@ -224,6 +289,7 @@ config = {
         div.thick_border { border: 4px solid black; }
 
         /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
+        /* average size of droid screen 470dp x 320dp  */
         canvas.emscripten {
             border: 0px none;
             background-color: transparent;
@@ -248,7 +314,6 @@ config = {
             background-color:powderblue;
         }
 
-        /* average size of droid screen 470dp x 320dp  */
         .topright{
            position:absolute;
            top:0px;
@@ -281,7 +346,7 @@ config = {
         }
     </style>
 
-    <script src="https://pmp-p.github.io/pygbag-wip//browserfs.min.js"></script>
+    <script src="https://pygame-web.github.io/archives/0.4//browserfs.min.js"></script>
 
 </head>
 
@@ -327,26 +392,27 @@ height="1px"
 
         </div>
 
-        <div id=box class="emscripten_border">
+        <div id=box class="emscripten_border" hidden=true>
+
             <div id="info" class="trinfo"></div>
 
-        <iframe id="iframe" class="framed" name="iframe"
+            <iframe id="iframe" class="framed" name="iframe"
 width="470px" height="90%"
-            sandbox="allow-same-origin allow-top-navigation allow-scripts allow-pointer-lock"
-            mozallowfullscreen="true"
-            allow="autoplay; fullscreen *; geolocation; microphone; camera; midi; monetization; xr-spatial-tracking; gamepad; gyroscope; accelerometer; xr; cross-origin-isolated"
+allowtransparency="true"
+style="z-index: 10; style="background: #FFFFFF;"
 frameborder="1"
-            src="https://pmp-p.github.io/pygbag-wip/empty.html"
-            msallowfullscreen="true"
-            scrolling="yes"
-            allowfullscreen="true"
-            webkitallowfullscreen="true"
-            allowtransparency="true" style="z-index: 10">
-        </iframe>
+                allowfullscreen="true"
+                webkitallowfullscreen="true"
+                msallowfullscreen="true"
+                mozallowfullscreen="true"
+                sandbox="allow-same-origin allow-top-navigation allow-scripts allow-pointer-lock"
+                allow="autoplay; fullscreen *; geolocation; microphone; camera; midi; monetization; xr-spatial-tracking; gamepad; gyroscope; accelerometer; xr; cross-origin-isolated"
+                src="https://pygame-web.github.io/archives/0.4/empty.html"
+                scrolling="yes">
+            </iframe>
         </div>
 
     </div>
-
 
 
     <div id="dlg" hidden>
@@ -355,12 +421,16 @@ frameborder="1"
     </div>
 
     <div id="pyconsole">
-        <div id="terminal" tabIndex=1 align="left"><p></div>
+        <div id="terminal" tabIndex=1 align="left"></div>
     </div>
 
     <script type="application/javascript">
-    function custom_onload(debug_hidden) {
+
+    async function custom_onload(debug_hidden) {
+        // this is called before anythinh python is loaded
+        // make your js customization here
         console.log(__FILE__, "custom_onload")
+
         pyconsole.hidden = debug_hidden
         system.hidden = debug_hidden
         transfer.hidden = debug_hidden
@@ -368,50 +438,48 @@ frameborder="1"
         box.hidden =  debug_hidden
     }
 
+    function custom_prerun(){
+        // no python main and no (MEMFS + VFS) yet.
+        console.log(__FILE__, "custom_prerun")
+
+    }
+
+    function custom_postrun(){
+        // python main and no VFS filesystem yet.
+        console.log(__FILE__, "custom_postrun")
+
+    }
+
     function debug() {
+        // allow to gain access to dev tools from js console
+        // but only on desktop. difficult to reach when in iframe
         python.config.debug = true
         custom_onload(false)
         Module.PyRun_SimpleString("shell.uptime()")
         window_resize()
     }
 
-    function custom_prerun(){
-        // no python main and no (MEMFS + VFS) yet.
-        console.log(__FILE__, "custom_prerun")
+    function info_inline(data){
+        document.getElementById("info").innerHTML = data
     }
 
-    function custom_postrun(){
-        // python main and no VFS filesystem yet.
-        console.log(__FILE__, "custom_prerun")
-    }
-
-    function info_online(url, data) {
+    function info_online(url) {
         // display info about current APK
         fetch( url /*, options */)
             .then((response) => response.text())
             .then((html) => {
-                document.getElementById("info").innerHTML = html || data;
+                info_inline(html);
         })
         .catch((error) => {
             console.warn(error);
         });
     }
 
-
-    function info_inline(data){
-        document.getElementById("info").innerHTML = data
-    }
-
-    var ifram_dom
-
-    function childLoaded() { ifram_dom = childGetElementById('someid');}
-
     function frame_online(url) {
         window.frames["iframe"].location = url;
     }
+
     </script>
-
-
 
 </body>
 </html>
